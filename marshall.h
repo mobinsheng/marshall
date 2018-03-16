@@ -41,27 +41,38 @@ using namespace std;
 #define __SAFE_CHECK__(size) assert(net_data.size() >= (size))
 
 
-class Marshall{
+class Marshallable{
 public:
-    Marshall(){
+    Marshallable(){
         is_little_endian = IsLittleEndian();
         net_data.clear();
 
     }
 
-    virtual ~Marshall(){
+    virtual ~Marshallable(){
     }
 
-    virtual void serialize(){
+    // 序列化
+    virtual void marshal(){
+
     }
 
-    virtual void deserialize(){
+    // 反序列化
+    virtual void unmarshal(){
+
     }
 
+    // 清除数据
+    void clear(){
+        net_data.clear();
+    }
+
+    // 返回序列化之后的数据长度
     size_t size(){
         return net_data.size();
     }
 
+    // 返回序列化之后的数据
     const char* data(){
         if(net_data.empty()){
             return NULL;
@@ -69,6 +80,15 @@ public:
         return &net_data[0];
     }
 
+    // 绑定数据，准备反序列化，当然也可以直接调用write接口
+    void set_data(const char* data,size_t size){
+        clear();
+        write(data,size);
+    }
+
+    /*********************************************
+     * 写入数据/序列化
+     ********************************************/
     void write_uint8(uint8_t v){
         net_data.push_back(v);
     }
@@ -102,10 +122,14 @@ public:
         __WRITE__(v);
     }
 
+    // 写入普通的二进制数据
     void write(const char* v,size_t size){
         net_data.insert(net_data.end(),v,v + size);
     }
 
+    /*********************************************
+     * 读取数据/反序列化
+     ********************************************/
     uint8_t read_uint8(){
         /*uint8_t v = *((uint8_t*)(&net_data[0]));
         pop(sizeof(v));
@@ -173,34 +197,34 @@ private:
         return (*(unsigned char *)&i == 1);
     }
 
-    vector<char> net_data;
+    vector<char> net_data; // 存放序列化之后的数据
     bool is_little_endian; // 字节顺序，是否为小端
 };
 
-Marshall& operator << (Marshall& output,uint8_t& c);
-Marshall& operator << (Marshall& output,int8_t& c);
+Marshallable& operator << (Marshallable& output,uint8_t& c);
+Marshallable& operator << (Marshallable& output,int8_t& c);
 
-Marshall& operator << (Marshall& output,uint16_t& c);
-Marshall& operator << (Marshall& output,int16_t& c);
+Marshallable& operator << (Marshallable& output,uint16_t& c);
+Marshallable& operator << (Marshallable& output,int16_t& c);
 
-Marshall& operator << (Marshall& output,uint32_t& c);
-Marshall& operator << (Marshall& output,int32_t& c);
+Marshallable& operator << (Marshallable& output,uint32_t& c);
+Marshallable& operator << (Marshallable& output,int32_t& c);
 
-Marshall& operator << (Marshall& output,uint64_t& c);
-Marshall& operator << (Marshall& output,int64_t& c);
+Marshallable& operator << (Marshallable& output,uint64_t& c);
+Marshallable& operator << (Marshallable& output,int64_t& c);
 
 
 
-Marshall& operator >> (Marshall& input,uint8_t& c);
-Marshall& operator >> (Marshall& input,int8_t& c);
+Marshallable& operator >> (Marshallable& input,uint8_t& c);
+Marshallable& operator >> (Marshallable& input,int8_t& c);
 
-Marshall& operator >> (Marshall& input,uint16_t& c);
-Marshall& operator >> (Marshall& input,int16_t& c);
+Marshallable& operator >> (Marshallable& input,uint16_t& c);
+Marshallable& operator >> (Marshallable& input,int16_t& c);
 
-Marshall& operator >> (Marshall& input,uint32_t& c);
-Marshall& operator >> (Marshall& input,int32_t& c);
+Marshallable& operator >> (Marshallable& input,uint32_t& c);
+Marshallable& operator >> (Marshallable& input,int32_t& c);
 
-Marshall& operator >> (Marshall& input,uint64_t& c);
-Marshall& operator >> (Marshall& input,int64_t& c);
+Marshallable& operator >> (Marshallable& input,uint64_t& c);
+Marshallable& operator >> (Marshallable& input,int64_t& c);
 
 #endif // MARSHALL_H

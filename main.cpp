@@ -3,7 +3,7 @@
 #include "marshall.h"
 using namespace std;
 
-class Head:public Marshall{
+class Head:public Marshallable{
 public:
     Head(){
 
@@ -12,7 +12,7 @@ public:
 
     }
 
-    void serialize(){
+    void marshall(){
         const char* inBuffer = "Hello World! !@#$%^&*()_+~`!@#$%^&*()";
         size_t len = strlen(inBuffer);
 
@@ -29,7 +29,7 @@ public:
         write(buffer,buffer_size);
     }
 
-    void deserialize(){
+    void unmarshall(){
         version = read_int16();
         type = read_int16();
         seq_id = read_uint64();
@@ -51,7 +51,7 @@ private:
 };
 
 void test1(){
-    Marshall m;
+    Marshallable m;
     char outBuffer[1024] ={0};
     const char* inBuffer = "Hello World! !@#$%^&*()_+~`!@#$%^&*()";
     size_t len = strlen(inBuffer);
@@ -110,9 +110,9 @@ void test1(){
 
 void test2(){
     Head h;
-    h.serialize();
+    h.marshal();
     h.data();
-    h.deserialize();
+    h.unmarshal();
 }
 
 int main()
